@@ -34,6 +34,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import org.carapaceproxy.ConfigurationProperties;
 import org.carapaceproxy.configstore.ConfigurationStore;
 import org.carapaceproxy.configstore.PropertiesConfigurationStore;
 import org.carapaceproxy.server.HttpProxyServer;
@@ -137,6 +138,8 @@ public class ConfigResource {
         if (count[0] == 0) {
             throw new ConfigurationNotValidException("No entries in the new configuration ?");
         }
+
+        // ConfigurationProperties.newValidator(simpleStore).validateProperties();
     }
 
     public static final class ConfigurationValidationResult {
