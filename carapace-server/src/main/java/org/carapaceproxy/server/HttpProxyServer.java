@@ -506,6 +506,10 @@ public class HttpProxyServer implements AutoCloseable {
         return dynamicConfigurationStore;
     }
 
+    public GroupMembershipHandler getGroupMembershipHandler() {
+        return this.groupMembershipHandler;
+    }
+
     private void initGroupMembership(ConfigurationStore staticConfiguration) throws ConfigurationNotValidException {
         String mode = staticConfiguration.getProperty("mode", "standalone");
         switch (mode) {

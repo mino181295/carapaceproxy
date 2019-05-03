@@ -62,7 +62,7 @@ public class ZooKeeperGroupMembershipHandler implements GroupMembershipHandler, 
     private final CopyOnWriteArrayList<PathChildrenCache> watchedEvents = new CopyOnWriteArrayList<>();
     private final ExecutorService callbacksExecutor = Executors.newSingleThreadExecutor();
 
-    public ZooKeeperGroupMembershipHandler(String zkAddress, int zkTimeout, String peerId) {
+    public ZooKeeperGroupMembershipHandler(String zkAddress, int zkTimeout, String peerId, Map<String, String> peerInfo) {
         client = CuratorFrameworkFactory
                 .builder()
                 .sessionTimeoutMs(zkTimeout)
@@ -176,8 +176,13 @@ public class ZooKeeperGroupMembershipHandler implements GroupMembershipHandler, 
         }
     }
 
+    public static class PeerInfo {
+        String peerId;
+        Map<String, String> peerInfo;
+    }
+
     @Override
-    public String describePeer(String peerId) {
+    public PeerInfo describePeer(String peerId) {
         return peerId;
     }
 
