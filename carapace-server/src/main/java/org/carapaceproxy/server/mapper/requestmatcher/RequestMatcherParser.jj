@@ -1,0 +1,100 @@
+PARSER_BEGIN(RequestMatcher)
+
+public class RequestMatcher {
+
+  /** Main entry point. */
+  public static void main(String args[]) throws ParseException {
+    RequestMatcher matcher = new RequestMatcher(System.in);
+    boolean ok = matcher.matches(args[0]);
+    System.out.println("OK: " + ok);
+  }
+
+}
+
+PARSER_END(RequestMatcher)
+
+SKIP :
+{
+    " " |
+    "\t" |
+    "\n" |
+    "\r"
+}
+
+TOKEN :
+{
+    < ALL: "all" > |
+    < REGEXP_DEF: "regexp" > |
+    < AND: "&&" > |
+    < OR: "||" > |
+    < NOT: "!" > |
+    < HTTPS: "https" > |
+    < O_BRACKET: "(" > |
+    < C_BRACKET: ")" > |
+    < REGEXP: "'" (~["'"])* "'" >
+}
+
+/** Top level production. */
+boolean matches(String value) :
+{
+    String regexp;
+    boolean cond;
+    boolean expr;
+}
+{
+    <ALL> { cond = true; } |
+    cond = expression() |
+    (
+        <REGEXP_DEF> regexp = <REGEXP> { cond = Pattern.compile(regexp.toString()).matcher(value).matches(); }
+        (
+            <AND> expr = expression() { cond &= expr; } |
+            <OR> expr = expression() { cond |= expr; }
+        )?
+    )
+    { return cond; }
+}
+
+boolean expression() :
+{
+    boolean term;
+    boolean term2;
+}
+{
+    term = term()
+    (
+        <OR> term2 = term() { term |= term2; }
+    )*
+    { return term; }
+}
+
+boolean term() :
+{
+    boolean factor;
+    boolean factor2;
+}
+{
+    factor = factor()
+    (
+        <AND> factor2 = factor() { factor &= factor2; }
+    )*
+    { return factor; }
+}
+
+boolean factor() :
+{
+    boolean value;
+}
+{
+    value = value() |
+    <NOT> value = factor() { value = !value; } |
+    (
+        <O_BRACKET> value = expression() <C_BRACKET>
+    )
+    { return value; }
+}
+
+boolean value() :
+{}
+{
+    <HTTPS> { return true; } // TODO: need to check the request
+}
